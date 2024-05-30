@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+ RewriteEngine On
+
+  # -- REDIRECTION to https (optional):
+ # If you need this, uncomment the next two commands
+ # RewriteCond %{HTTPS} !on
+   # RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+ # --
+
+ RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+ RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+
+ RewriteRule ^.*$ - [NC,L]
+ RewriteRule ^(.*) index.html [NC,L]
+</IfModule>
+
+# /usr/local/apache2/htdocs/semka24/.htaccess
+
+## Перенаправление всех запросов на главную страницу сайта
+#Redirect /test-htaccess /index.html
+#
+## Или установите пользовательский заголовок
+#Header set X-Test "it works"

@@ -1,0 +1,16 @@
+spring:
+  application.name: Application
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: root
+    password: root
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  jpa:
+    show-ddl: true
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
