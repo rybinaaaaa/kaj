@@ -9,6 +9,9 @@ import MyNavigation from './components/MyNavigation/MyNavigation';
 import MyItemCard from './components/MyItemCard/MyItemCard';
 import MyConnectionAlert from './components/MyConnectionAlert/MyConnectionAlert';
 
+/**
+ * Define custom elements.
+ */
 window.customElements.define('my-audio', MyAudio);
 window.customElements.define('my-modal-alert', MyModalAlert);
 window.customElements.define('my-modal-buy', MyModalToBuy);
@@ -18,19 +21,24 @@ window.customElements.define('my-navigation', MyNavigation);
 window.customElements.define('my-item-card', MyItemCard);
 window.customElements.define('my-connection-alert', MyConnectionAlert);
 
-window.addEventListener('load', (e) => {
-  console.log("я должен работать один раз");
-  handleEvent(e);
-});
+/**
+ * Event listener for the 'load' event.
+ * @param {Event} e - The load event.
+ */
+window.addEventListener('load', handleEvent);
 
-window.addEventListener('popstate', (e) => {
-  const search = window.location.pathname;
-  console.log("я должен работать не один раз");
-  PageRenderer.renderPage(search);
-})
+/**
+ * Event listener for the 'popstate' event.
+ * @param {PopStateEvent} e - The popstate event.
+ */
+window.addEventListener('popstate', handleEvent);
 
+/**
+ * Handle various events and render the appropriate page.
+ * @param {Event} e - The event to handle.
+ */
 function handleEvent(e) {
-  e.preventDefault();
+  // e.preventDefault();
   const search = window.location.pathname;
   history.pushState({}, '', window.location.href);
   PageRenderer.renderPage(search);

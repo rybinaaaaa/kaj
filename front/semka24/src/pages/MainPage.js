@@ -2,12 +2,27 @@ import ScrollHandler from '../handlers/ScrollHandler';
 import DBfasade from '../utils/DBfasade';
 import PageRenderer from '../PageRenderer';
 
+/**
+ * Class representing the main page.
+ */
 export default class MainPage {
   constructor() {
+    /**
+     * Stored items to be rendered on the page.
+     * @type {Array}
+     */
     this.storedItems = [];
-    this.scrollHandler = null;
+
+    /**
+     * Instance of ScrollHandler to handle scroll events.
+     * @type {ScrollHandler}
+     */
+    this.scrollHandler = new ScrollHandler(this);
   }
 
+  /**
+   * Renders the main page.
+   */
   render() {
     const root = document.querySelector('#root');
 
@@ -21,11 +36,12 @@ export default class MainPage {
     `;
     const loadMore = document.querySelector('#load_more');
 
-    this.scrollHandler = new ScrollHandler(this);
-
-    loadMore.addEventListener('click', () => {
-      this.scrollHandler.handleScroll();
+    this.scrollHandler.disableLoadMoreIfNecessary().then(() => {
+      loadMore.addEventListener('click', () => {
+        this.scrollHandler.handleScroll();
+      });
     });
+
     if (this.storedItems.length) {
       this.renderStoredItems();
     } else {
@@ -34,9 +50,11 @@ export default class MainPage {
     PageRenderer.handleLinks();
   }
 
+  /**
+   * Renders stored items on the page.
+   */
   async renderStoredItems() {
     const root = document.querySelector('#root');
-
     const container = root.querySelector('#item_container');
 
     if (!this.storedItems.length) {
@@ -48,6 +66,9 @@ export default class MainPage {
     });
   }
 
+  /**
+   * Renders loading placeholders for items.
+   */
   renderLoadingItems() {
     const container = document.querySelector('#item_container');
 
@@ -58,6 +79,11 @@ export default class MainPage {
     }
   }
 
+  /**
+   * Renders new items on the page.
+   * @param {number} [page=0] - The page number to fetch items from.
+   * @param {number} [limit=8] - The number of items to fetch.
+   */
   async renderNewItems(page = 0, limit = 8) {
     this.renderLoadingItems();
     const items = await DBfasade.getArts(page, limit);
@@ -67,6 +93,10 @@ export default class MainPage {
     this.renderStoredItems();
   }
 
+  /**
+   * Renders a single item on the page.
+   * @param {Object} item - The item to render.
+   */
   renderItem(item) {
     const container = document.querySelector('#item_container');
 

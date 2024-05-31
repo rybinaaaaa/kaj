@@ -1,7 +1,14 @@
 import DBfasade from '../utils/DBfasade';
 import PageRenderer from '../PageRenderer';
 
+/**
+ * Class representing the item page.
+ */
 export default class ItemPage {
+  /**
+   * Renders the item page.
+   * @param {string} search - The search string containing  path item/{id} about the requested item.
+   */
   async render(search) {
     const root = document.querySelector('#root');
 
@@ -24,7 +31,7 @@ export default class ItemPage {
                       </div>
                     </div>
                   </div>
-    `
+    `;
 
     const parts = search.split('/');
     const itemId = parts[parts.length - 1];
@@ -60,17 +67,26 @@ export default class ItemPage {
     `;
 
     document.querySelector('.art__info__buy').addEventListener('click', (e) => {
-      console.log(root.querySelector('my-modal'));
       root.querySelector('my-modal').setAttribute('active', 'true');
     });
 
     PageRenderer.handleLinks();
   }
 
+  /**
+   * Gets the previous item ID.
+   * @param {Object} item - The current item object.
+   * @returns {number|null} The previous item ID, or null if there is no previous item.
+   */
   static getPrev(item) {
     return item.id <= 1 ? null : item.id - 1;
   }
 
+  /**
+   * Gets the next item ID.
+   * @param {Object} item - The current item object.
+   * @returns {Promise<number|null>} The next item ID, or null if there is no next item.
+   */
   static async getNext(item) {
     return item.id >= (await DBfasade.getArtsLimit()) ? null : item.id + 1;
   }

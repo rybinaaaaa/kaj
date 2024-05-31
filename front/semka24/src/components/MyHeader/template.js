@@ -9,7 +9,7 @@ headerTemplate.innerHTML = `
                         ${styleProps}
                       </style>
                      <header class="header container">
-                        <a href="/semka24" id="go-back">
+                        <a href="/semka24/" id="go-back">
                           <svg width="65" height="21" viewBox="0 0 65 21" fill="none" xmlns="http://www.w3.org/2000/svg"
                               class="header__arrow-back">
                             <line x1="1.26834" y1="11.5001" x2="64.9922" y2="10.5001" stroke="#9B9494" />

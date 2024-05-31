@@ -11,7 +11,7 @@ export default class AboutUsPage {
     root.innerHTML = `
     <my-header></my-header>
     <div class="container">
-      <section class="intro_video"">
+      <section class="intro_video">
         <h1>
           Who are we?
         </h1>
@@ -56,6 +56,26 @@ export default class AboutUsPage {
     `;
 
     AboutUsPage.observe();
+
+    const video = document.querySelector('video');
+
+    video.addEventListener('wheel', e => {
+      let volume = video.volume
+      if (e.deltaY > 0) {
+        volume -= 0.05;
+      } else  {
+        volume += 0.05;
+      }
+
+      if (volume < 0) {
+        volume = 0;
+      } else if (volume > 1) {
+        volume = 1;
+      }
+
+      video.volume = volume;
+
+    }, { passive: true });
   }
 
   /**

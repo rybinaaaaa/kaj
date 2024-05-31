@@ -3,29 +3,57 @@ import ItemPage from './pages/ItemPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ErrorPage from './pages/ErrorPage';
 
+/**
+ * Class for rendering different pages based on the URL.
+ */
 export default class PageRenderer {
+  /**
+   * Renders the main page.
+   * @type {MainPage}
+   */
   static mainPageRenderer = new MainPage();
+
+  /**
+   * Renders the item page.
+   * @type {ItemPage}
+   */
   static itemPageRenderer = new ItemPage();
+
+  /**
+   * Renders the about us page.
+   * @type {AboutUsPage}
+   */
   static aboutUsPageRenderer = new AboutUsPage();
+
+  /**
+   * Renders the error page.
+   * @type {ErrorPage}
+   */
   static errorPageRenderer = new ErrorPage();
 
-  constructor() {}
-
+  /**
+   * Array of page objects containing regex and corresponding render functions.
+   * @type {Array<{ regex: RegExp, render: Function }>}
+   */
   static pages = [
     {
       regex: /^\/semka24\/$/,
-      render: this.mainPageRenderer.render.bind(this.mainPageRenderer),
+      render: this.mainPageRenderer.render.bind(this.mainPageRenderer)
     },
     {
       regex: /^\/semka24\/item\/\d+$/,
-      render: this.itemPageRenderer.render.bind(this.itemPageRenderer),
+      render: this.itemPageRenderer.render.bind(this.itemPageRenderer)
     },
     {
       regex: /^\/semka24\/aboutUs/,
-      render: this.aboutUsPageRenderer.render.bind(this.aboutUsPageRenderer),
-    },
+      render: this.aboutUsPageRenderer.render.bind(this.aboutUsPageRenderer)
+    }
   ];
 
+  /**
+   * Renders the page based on the URL.
+   * @param {string} search - The URL to render.
+   */
   static renderPage(search) {
     for (let p of this.pages) {
       if (p.regex.test(search)) {
@@ -36,17 +64,24 @@ export default class PageRenderer {
     this.errorPageRenderer.render();
   }
 
-  static handleEventOnLinks(e, a) {
+  /**
+   * Event handler for links.
+   * @param {Event} e - The click event.
+   */
+  static handleEventOnLinks(e) {
+    const a = e.currentTarget;
     e.preventDefault();
     const search = a.href;
-    console.log(window.location.href);
     history.pushState({}, '', search);
-    this.renderPage(window.location.pathname);
+    PageRenderer.renderPage(window.location.pathname);
   }
 
+  /**
+   * Handles all links on the page.
+   */
   static handleLinks() {
     document.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', (e) => this.handleEventOnLinks(e, a));
+      a.addEventListener('click', PageRenderer.handleEventOnLinks);
     });
   }
 }

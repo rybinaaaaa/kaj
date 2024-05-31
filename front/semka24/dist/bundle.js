@@ -503,29 +503,57 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Class for rendering different pages based on the URL.
+ */
 class PageRenderer {
+  /**
+   * Renders the main page.
+   * @type {MainPage}
+   */
   static mainPageRenderer = new _pages_MainPage__WEBPACK_IMPORTED_MODULE_0__["default"]();
+
+  /**
+   * Renders the item page.
+   * @type {ItemPage}
+   */
   static itemPageRenderer = new _pages_ItemPage__WEBPACK_IMPORTED_MODULE_1__["default"]();
+
+  /**
+   * Renders the about us page.
+   * @type {AboutUsPage}
+   */
   static aboutUsPageRenderer = new _pages_AboutUsPage__WEBPACK_IMPORTED_MODULE_2__["default"]();
+
+  /**
+   * Renders the error page.
+   * @type {ErrorPage}
+   */
   static errorPageRenderer = new _pages_ErrorPage__WEBPACK_IMPORTED_MODULE_3__["default"]();
 
-  constructor() {}
-
+  /**
+   * Array of page objects containing regex and corresponding render functions.
+   * @type {Array<{ regex: RegExp, render: Function }>}
+   */
   static pages = [
     {
       regex: /^\/semka24\/$/,
-      render: this.mainPageRenderer.render.bind(this.mainPageRenderer),
+      render: this.mainPageRenderer.render.bind(this.mainPageRenderer)
     },
     {
       regex: /^\/semka24\/item\/\d+$/,
-      render: this.itemPageRenderer.render.bind(this.itemPageRenderer),
+      render: this.itemPageRenderer.render.bind(this.itemPageRenderer)
     },
     {
       regex: /^\/semka24\/aboutUs/,
-      render: this.aboutUsPageRenderer.render.bind(this.aboutUsPageRenderer),
-    },
+      render: this.aboutUsPageRenderer.render.bind(this.aboutUsPageRenderer)
+    }
   ];
 
+  /**
+   * Renders the page based on the URL.
+   * @param {string} search - The URL to render.
+   */
   static renderPage(search) {
     for (let p of this.pages) {
       if (p.regex.test(search)) {
@@ -536,17 +564,24 @@ class PageRenderer {
     this.errorPageRenderer.render();
   }
 
-  static handleEventOnLinks(e, a) {
+  /**
+   * Event handler for links.
+   * @param {Event} e - The click event.
+   */
+  static handleEventOnLinks(e) {
+    const a = e.currentTarget;
     e.preventDefault();
     const search = a.href;
-    console.log(window.location.href);
     history.pushState({}, '', search);
-    this.renderPage(window.location.pathname);
+    PageRenderer.renderPage(window.location.pathname);
   }
 
+  /**
+   * Handles all links on the page.
+   */
   static handleLinks() {
     document.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', (e) => this.handleEventOnLinks(e, a));
+      a.addEventListener('click', PageRenderer.handleEventOnLinks);
     });
   }
 }
@@ -570,14 +605,28 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Web component for audio playback with play/pause controls.
+ */
 class MyAudio extends HTMLElement {
+  /**
+   * Constructs the MyAudio element, attaching a shadow DOM and initializing the audio handler.
+   */
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
 
+    /**
+     * AudioHandler instance to control the audio playback.
+     * @type {AudioHandler}
+     */
     this.audioHandler = new _handlers_AudioHandler__WEBPACK_IMPORTED_MODULE_0__["default"](this.getAttribute('mp3Src'));
-    }
+  }
 
+  /**
+   * Called when the element is added to the document.
+   * Sets up the audio controls and event listeners.
+   */
   connectedCallback() {
     const content = _template__WEBPACK_IMPORTED_MODULE_1__["default"].content.cloneNode(true);
 
@@ -599,6 +648,10 @@ class MyAudio extends HTMLElement {
     this.shadowRoot.appendChild(content);
   }
 
+  /**
+   * Called when the element is removed from the document.
+   * Pauses the audio playback.
+   */
   disconnectedCallback() {
     this.audioHandler.pause();
   }
@@ -683,30 +736,68 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./template */ "./src/components/MyConnectionAlert/template.js");
 
 
+/**
+ * Web component for displaying a connection alert.
+ * Shows an alert when the device goes offline and hides it when back online.
+ */
 class MyConnectionAlert extends HTMLElement {
+  /**
+   * Constructs the MyConnectionAlert element, attaching a shadow DOM.
+   * Initializes event handlers for online and offline events.
+   */
   constructor() {
     super();
+    /**
+     * The content of the alert template.
+     * @type {DocumentFragment}
+     */
     this.content = _template__WEBPACK_IMPORTED_MODULE_0__["default"].content.cloneNode(true);
     this.attachShadow({ mode: 'open' });
+
+    /**
+     * Binds the offline event handler to the current instance.
+     * @type {Function}
+     */
     this.handleOffline = this.handleOffline.bind(this);
+
+    /**
+     * Binds the online event handler to the current instance.
+     * @type {Function}
+     */
     this.handleOnline = this.handleOnline.bind(this);
   }
 
+  /**
+   * Called when the element is added to the document.
+   * Appends the template content to the shadow root and adds event listeners for online and offline events.
+   */
   connectedCallback() {
     this.shadowRoot.appendChild(this.content);
     window.addEventListener('offline', this.handleOffline);
     window.addEventListener('online', this.handleOnline);
   }
 
+  /**
+   * Called when the element is removed from the document.
+   * Removes event listeners for online and offline events.
+   */
   disconnectedCallback() {
     window.removeEventListener('offline', this.handleOffline);
     window.removeEventListener('online', this.handleOnline);
   }
 
+  /**
+   * Event handler for the offline event.
+   * Adds the 'active' class to the component to show the alert.
+   */
   handleOffline() {
     this.classList.add('active');
   }
 
+  /**
+   * Event handler for the online event.
+   * Removes the 'active' class from the component to hide the alert.
+   */
   handleOnline() {
     this.classList.remove('active');
   }
@@ -789,23 +880,55 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Web component for the header of the page.
+ * Includes functionality for navigating back in history and handling "About Us" link clicks.
+ */
 class MyHeader extends HTMLElement {
+  /**
+   * Constructs the MyHeader element, attaching a shadow DOM.
+   * Clones the header template content.
+   */
   constructor() {
     super();
+    /**
+     * The content of the header template.
+     * @type {DocumentFragment}
+     */
     this.content = _template__WEBPACK_IMPORTED_MODULE_0__["default"].content.cloneNode(true);
     this.attachShadow({ mode: 'open' });
   }
 
+  /**
+   * Called when the element is added to the document.
+   * Appends the template content to the shadow root and adds event listeners for the "Go Back" and "About Us" links.
+   */
   connectedCallback() {
     this.shadowRoot.appendChild(this.content);
-    this.shadowRoot.querySelector('#go-back').addEventListener('click', e => {
-      e.preventDefault();
-      window.history.back();
-    })
-    this.shadowRoot.querySelector('.about_us').addEventListener('click', e => {
-      _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].handleEventOnLinks(e, e.target)
-    })
 
+    // /**
+    //  * Event listener for the "Go Back" button.
+    //  * Navigates back in the browser history.
+    //  * @param {Event} e - The click event.
+    //  */
+    // this.shadowRoot.querySelector('#go-back').addEventListener('click', e => {
+    //   e.preventDefault();
+    //   window.history.back();
+    // });
+
+    /**
+     * Event listener for the "About Us" link.
+     * Handles the link click using PageRenderer.
+     * @param {Event} e - The click event.
+     */
+    this.shadowRoot.querySelector('.about_us').addEventListener('click', _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].handleEventOnLinks);
+
+    /**
+     * Event listener for the "Home" link.
+     * Handles the link click using PageRenderer.
+     * @param {Event} e - The click event.
+     */
+    this.shadowRoot.querySelector('#go-back').addEventListener('click', _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].handleEventOnLinks);
   }
 }
 
@@ -898,7 +1021,7 @@ headerTemplate.innerHTML = `
                         ${_styleProps__WEBPACK_IMPORTED_MODULE_0__["default"]}
                       </style>
                      <header class="header container">
-                        <a href="/semka24" id="go-back">
+                        <a href="/semka24/" id="go-back">
                           <svg width="65" height="21" viewBox="0 0 65 21" fill="none" xmlns="http://www.w3.org/2000/svg"
                               class="header__arrow-back">
                             <line x1="1.26834" y1="11.5001" x2="64.9922" y2="10.5001" stroke="#9B9494" />
@@ -930,13 +1053,29 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Web component representing an item card.
+ * Handles rendering of item details and navigation on click.
+ */
 class MyItemCard extends HTMLElement {
+  /**
+   * Constructs the MyItemCard element, attaching a shadow DOM.
+   * Clones the card template content.
+   */
   constructor() {
     super();
+    /**
+     * The content of the card template.
+     * @type {DocumentFragment}
+     */
     this.content = _template__WEBPACK_IMPORTED_MODULE_0__["default"].content.cloneNode(true);
     this.attachShadow({ mode: 'open' });
   }
 
+  /**
+   * Called when the element is added to the document.
+   * Appends the template content to the shadow root and adds a show class to the item after a delay.
+   */
   connectedCallback() {
     this.shadowRoot.appendChild(this.content);
     setTimeout(() => {
@@ -944,6 +1083,10 @@ class MyItemCard extends HTMLElement {
     }, 100);
   }
 
+  /**
+   * Fetches the item card data and updates the card's content.
+   * Removes the loading class from the item.
+   */
   fetchCard() {
     this.shadowRoot.querySelector('.item').classList.remove('loading');
 
@@ -955,26 +1098,44 @@ class MyItemCard extends HTMLElement {
     this.shadowRoot.querySelector('.item__img img').src = itemImgSrc;
     this.shadowRoot.querySelector('.title-text').textContent = itemName;
     this.shadowRoot.querySelector('.subtitle-text').textContent = itemAuthor;
+
     this.href = `/semka24/item/${itemId}`;
     this.addEventListener('click', (e) => {
       e.preventDefault();
       const search = this.href;
-      console.log(window.location.href);
       history.pushState({}, '', search);
       _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].renderPage(window.location.pathname);
-    })
+    });
   }
 
+  /**
+   * Specifies the attributes to observe for changes.
+   * @returns {string[]} The list of observed attributes.
+   */
   static get observedAttributes() {
     return ['loading'];
   }
 
+  /**
+   * Called when an observed attribute changes.
+   * @param {string} name - The name of the attribute.
+   * @param {string} oldValue - The old value of the attribute.
+   * @param {string} newValue - The new value of the attribute.
+   */
   attributeChangedCallback(name, oldValue, newValue) {
     if (!(name === 'loading' && newValue === 'true')) {
       this.fetchCard();
     }
   }
 
+  /**
+   * Sets the item data and updates the corresponding attributes.
+   * @param {Object} item - The item data.
+   * @param {string} item.id - The ID of the item.
+   * @param {string} item.name - The name of the item.
+   * @param {string} item.imgSrc - The image source URL of the item.
+   * @param {string} item.author - The author of the item.
+   */
   setItem(item) {
     this.setAttribute('id', item.id);
     this.setAttribute('name', item.name);
@@ -1122,17 +1283,44 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Web component representing a modal dialog.
+ * Handles initialization and attribute changes for modal behavior.
+ */
 class MyModal extends HTMLElement {
+  /**
+   * Constructs the MyModal element, attaching a shadow DOM and initializing modal handler.
+   */
   constructor() {
     super();
+    /**
+     * The content of the modal template.
+     * @type {DocumentFragment}
+     */
     this.content = _template__WEBPACK_IMPORTED_MODULE_0__["default"].content.cloneNode(true);
     this.attachShadow({ mode: 'open' });
 
+    /**
+     * The modal for buying items.
+     * @type {HTMLElement}
+     */
     this.modalToBuy = this.content.querySelector('my-modal-buy');
+    /**
+     * The alert modal.
+     * @type {HTMLElement}
+     */
     this.modalAlert = this.content.querySelector('my-modal-alert');
+    /**
+     * The handler for modal interactions.
+     * @type {ModalHandler}
+     */
     this.modalHandler = new _handlers_ModalHandler2__WEBPACK_IMPORTED_MODULE_1__["default"](this);
   }
 
+  /**
+   * Called when the element is added to the document.
+   * Initializes the modal with the item ID and sets up event listeners.
+   */
   connectedCallback() {
     this.modalToBuy.setAttribute('item-id', this.getAttribute('item-id'));
 
@@ -1149,10 +1337,20 @@ class MyModal extends HTMLElement {
     this.modalHandler.init();
   }
 
+  /**
+   * Specifies the attributes to observe for changes.
+   * @returns {string[]} The list of observed attributes.
+   */
   static get observedAttributes() {
     return ['active'];
   }
 
+  /**
+   * Called when an observed attribute changes.
+   * @param {string} name - The name of the attribute.
+   * @param {string} oldValue - The old value of the attribute.
+   * @param {string} newValue - The new value of the attribute.
+   */
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'active') {
       this.modalToBuy.setAttribute('active', newValue);
@@ -1177,24 +1375,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./template */ "./src/components/MyModal/MyModalAlert/template.js");
 
 
+/**
+ * Web component representing a modal alert.
+ * Displays a message to the user.
+ */
 class MyModalAlert extends HTMLElement {
+  /**
+   * Constructs the MyModalAlert element, attaching a shadow DOM and setting up content.
+   */
   constructor() {
     super();
+    /**
+     * The content of the modal template.
+     * @type {DocumentFragment}
+     */
     this.content = _template__WEBPACK_IMPORTED_MODULE_0__["default"].content.cloneNode(true);
     this.attachShadow({ mode: 'open' });
   }
 
+  /**
+   * Called when the element is added to the document.
+   * Appends the modal content to the shadow DOM.
+   */
   connectedCallback() {
     this.shadowRoot.appendChild(this.content);
   }
 
-  disconnectedCallback() {
-  }
-
+  /**
+   * Specifies the attributes to observe for changes.
+   * @returns {string[]} The list of observed attributes.
+   */
   static get observedAttributes() {
     return ['active'];
   }
 
+  /**
+   * Called when an observed attribute changes.
+   * Updates the modal's visibility based on the 'active' attribute.
+   * @param {string} name - The name of the attribute.
+   * @param {string} oldValue - The old value of the attribute.
+   * @param {string} newValue - The new value of the attribute.
+   */
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === null) return;
     if (name === 'active') {
@@ -1258,22 +1479,48 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./template */ "./src/components/MyModal/MyModalToBuy/template.js");
 
 
+/**
+ * Web component representing a modal to buy an item.
+ * Allows users to purchase items.
+ */
 class MyModalToBuy extends HTMLElement {
+  /**
+   * Constructs the MyModalToBuy element, attaching a shadow DOM and setting up content.
+   */
   constructor() {
     super();
+    /**
+     * The content of the modal template.
+     * @type {DocumentFragment}
+     */
     this.content = _template__WEBPACK_IMPORTED_MODULE_0__["default"].content.cloneNode(true);
     this.attachShadow({ mode: 'open' });
   }
 
+  /**
+   * Called when the element is added to the document.
+   * Sets the item ID in the modal and appends the modal content to the shadow DOM.
+   */
   connectedCallback() {
     this.content.querySelector('#id').value = this.getAttribute('item-id');
     this.shadowRoot.appendChild(this.content);
   }
 
+  /**
+   * Specifies the attributes to observe for changes.
+   * @returns {string[]} The list of observed attributes.
+   */
   static get observedAttributes() {
     return ['active'];
   }
 
+  /**
+   * Called when an observed attribute changes.
+   * Updates the modal's visibility based on the 'active' attribute.
+   * @param {string} name - The name of the attribute.
+   * @param {string} oldValue - The old value of the attribute.
+   * @param {string} newValue - The new value of the attribute.
+   */
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === null) return;
     if (name === 'active') {
@@ -1545,13 +1792,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./template */ "./src/components/MyNavigation/template.js");
 
 
+/**
+ * Web component representing navigation links.
+ * Allows users to navigate to the next and previous items.
+ */
 class MyNavigation extends HTMLElement {
+  /**
+   * Constructs the MyNavigation element, attaching a shadow DOM and setting up content.
+   */
   constructor() {
     super();
+    /**
+     * The content of the navigation template.
+     * @type {DocumentFragment}
+     */
     this.content = _template__WEBPACK_IMPORTED_MODULE_0__["default"].content.cloneNode(true);
     this.attachShadow({ mode: 'open' });
   }
 
+  /**
+   * Called when the element is added to the document.
+   * Sets up the navigation links based on the 'next' and 'prev' attributes.
+   */
   connectedCallback() {
     const next = this.getAttribute('next');
     const prev = this.getAttribute('prev');
@@ -1742,15 +2004,32 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ AudioHandler)
 /* harmony export */ });
+/**
+ * Class to handle audio playback.
+ */
 class AudioHandler {
+  /**
+   * Creates an instance of AudioHandler.
+   * @param {string} mp3Src - The source URL of the MP3 file.
+   */
   constructor(mp3Src) {
+    /**
+     * The audio player instance.
+     * @type {HTMLAudioElement}
+     */
     this.player = new Audio(mp3Src);
   }
 
+  /**
+   * Plays the audio.
+   */
   play() {
     this.player.play();
   }
 
+  /**
+   * Pauses the audio.
+   */
   pause() {
     this.player.pause();
   }
@@ -1776,38 +2055,78 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Class to handle modal interactions and events.
+ */
 class ModalHandler {
+  /**
+   * @type {HTMLElement|null}
+   * @private
+   */
   _modalToBuy;
+
+  /**
+   * @type {HTMLElement|null}
+   * @private
+   */
   _modalAlert;
+
+  /**
+   * @type {HTMLElement|null}
+   * @private
+   */
   _modal;
 
+  /**
+   * Creates an instance of ModalHandler.
+   * @param {HTMLElement} modal - The modal element.
+   */
   constructor(modal) {
+    /**
+     * WeakMap to store event listeners.
+     * @type {WeakMap}
+     */
     this.events = new (lodash_WeakMap__WEBPACK_IMPORTED_MODULE_1___default())();
     this.modal = modal;
   }
 
+  /**
+   * Adds an event listener and stores it in the WeakMap.
+   * @param {HTMLElement} element - The element to attach the event to.
+   * @param {string} event - The event type.
+   * @param {Function} handler - The event handler.
+   */
   addEventListenerWithStorage(element, event, handler) {
     element.addEventListener(event, handler);
     this.events.set(element, { event, handler });
   }
 
+  /**
+   * Removes all stored event listeners.
+   */
   removeAllEventListeners() {
     for (const [element, { event, handler }] of this.events) {
       element.removeEventListener(event, handler);
     }
-    this.events = new (lodash_WeakMap__WEBPACK_IMPORTED_MODULE_1___default())(); // Очистка карты
+    this.events = new (lodash_WeakMap__WEBPACK_IMPORTED_MODULE_1___default())(); // Clear the map
   }
 
+  /**
+   * Sets the modal to buy and updates event listeners.
+   * @param {HTMLElement} modal - The modal element to buy.
+   */
   set modalToBuy(modal) {
     if (this._modalToBuy) {
       this.events.delete(this._modalToBuy);
-      this.events.delete(
-        this._modalToBuy.shadowRoot.querySelector('#modal_buy_form'),
-      );
+      this.events.delete(this._modalToBuy.shadowRoot.querySelector('#modal_buy_form'));
     }
     this._modalToBuy = modal;
   }
 
+  /**
+   * Sets the modal alert and updates event listeners.
+   * @param {HTMLElement} modal - The modal alert element.
+   */
   set modalAlert(modal) {
     if (this._modalToBuy) {
       this.events.delete(this._modalToBuy);
@@ -1815,45 +2134,54 @@ class ModalHandler {
     this._modalAlert = modal;
   }
 
+  /**
+   * Sets the main modal and updates associated modals.
+   * @param {Object} modal - The modal elements container.
+   * @param {HTMLElement} modal.modalToBuy - The modal to buy element.
+   * @param {HTMLElement} modal.modalAlert - The modal alert element.
+   */
   set modal(modal) {
     this._modal = modal;
     this.modalToBuy = modal.modalToBuy;
     this.modalAlert = modal.modalAlert;
   }
 
+  /**
+   * Initializes the modal handler by setting up event listeners.
+   */
   init() {
-    // this._modal.addEventListener('click', (e) => {
-    //   if (
-    //     e.target !== this._modal.shadowRoot.querySelector('.modal__content')
-    //   ) {
-    //     this._modal.setAttribute('active', 'false');
-    //   }
-    // });
-
     const form = this._modalToBuy.shadowRoot.querySelector('#modal_buy_form');
     this.addEventListenerWithStorage(form, 'submit', async (e) => {
       e.preventDefault();
       try {
         const extractedData = this.handleFormData(form);
-        const response = _utils_DBfasade__WEBPACK_IMPORTED_MODULE_0__["default"].sendLead(extractedData).then(() => {
-          this._modal.setAttribute('active', 'false');
-          if (this._modalAlert) {
-            this._modalAlert.setAttribute('active', 'true');
-            setTimeout(() => {
-              this._modalAlert.setAttribute('active', 'false');
-            }, 3000);
-          }
-        });
+        await _utils_DBfasade__WEBPACK_IMPORTED_MODULE_0__["default"].sendLead(extractedData);
+        this._modal.setAttribute('active', 'false');
+        if (this._modalAlert) {
+          this._modalAlert.setAttribute('active', 'true');
+          setTimeout(() => {
+            this._modalAlert.setAttribute('active', 'false');
+          }, 3000);
+        }
       } catch (err) {
         console.log(err);
       }
     });
   }
 
+  /**
+   * Stops the modal handler by removing all event listeners.
+   */
   stop() {
     this.removeAllEventListeners();
   }
 
+  /**
+   * Handles form data validation and extraction.
+   * @param {HTMLFormElement} form - The form element.
+   * @returns {Object} The extracted form data.
+   * @throws {Error} If the form data is incorrect.
+   */
   handleFormData(form) {
     let isCorrect = true;
 
@@ -1864,9 +2192,7 @@ class ModalHandler {
     const idField = form.elements.id;
 
     const isEmailValid = this.modalValidator.validateEmail(emailField.value);
-    const isNumberValid = this.modalValidator.validatePhoneNumber(
-      numberField.value,
-    );
+    const isNumberValid = this.modalValidator.validatePhoneNumber(numberField.value);
     const isNameValid = this.modalValidator.validateName(nameField.value);
     const isSurnameValid = this.modalValidator.validateName(surnameField.value);
 
@@ -1915,24 +2241,42 @@ class ModalHandler {
       surname: surnameField.value,
       email: emailField.value,
       number: numberField.value,
-      artId: +idField.value,
+      artId: +idField.value
     };
   }
 
+  /**
+   * Validator object for form data.
+   */
   modalValidator = {
+    /**
+     * Validates an email address.
+     * @param {string} email - The email address.
+     * @returns {boolean} True if the email is valid, false otherwise.
+     */
     validateEmail: (email) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     },
 
+    /**
+     * Validates a phone number.
+     * @param {string} number - The phone number.
+     * @returns {boolean} True if the phone number is valid, false otherwise.
+     */
     validatePhoneNumber: (number) => {
       const phoneRegex = /^\d{10}$/;
       return phoneRegex.test(number);
     },
 
+    /**
+     * Validates a name or surname.
+     * @param {string} name - The name or surname.
+     * @returns {boolean} True if the name is not empty, false otherwise.
+     */
     validateName: (name) => {
       return name.trim() !== '';
-    },
+    }
   };
 }
 
@@ -1953,25 +2297,54 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_DBfasade__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/DBfasade */ "./src/utils/DBfasade.js");
 
 
+/**
+ * Class to handle scroll-based pagination and item loading.
+ */
 class ScrollHandler {
+  /**
+   * The current page number.
+   * @type {number}
+   */
   currentPage = 0;
+
+  /**
+   * The number of items to load per page.
+   * @type {number}
+   */
   LIMIT_PER_PAGE = 8;
 
+  /**
+   * The total limit of items available.
+   * @type {number}
+   */
+  LIMIT = null;
+
+  /**
+   * Creates an instance of ScrollHandler.
+   * @param {Object} mainPageRenderer - An object responsible for rendering new items on the main page.
+   */
   constructor(mainPageRenderer) {
     this.mainPageRenderer = mainPageRenderer;
-    this.fetchLimit()
   }
 
+  /**
+   * Fetches the total limit of items and disables the load more button if necessary.
+   */
   async fetchLimit() {
     this.LIMIT = await _utils_DBfasade__WEBPACK_IMPORTED_MODULE_0__["default"].getArtsLimit();
-    this.disableLoadMoreIfNecessary();
   }
 
+  /**
+   * Handles the scroll event, incrementing the current page and loading more items.
+   */
   handleScroll() {
     this.currentPage++;
     this.loadMoreItems();
   }
 
+  /**
+   * Loads more items by rendering them and then scrolling into view.
+   */
   loadMoreItems() {
     this.disableLoadMoreIfNecessary();
     this.mainPageRenderer.renderNewItems(
@@ -1986,12 +2359,21 @@ class ScrollHandler {
     }, 100);
   }
 
-  disableLoadMoreIfNecessary() {
-    if ((this.currentPage + 1) * this.LIMIT_PER_PAGE >= this.LIMIT) {
+  /**
+   * Disables the load more button if there are no more items to load.
+   */
+  async disableLoadMoreIfNecessary() {
+    await this.fetchLimit();
+    if (this.LIMIT && (this.currentPage + 1) * this.LIMIT_PER_PAGE >= this.LIMIT) {
+    console.log(`disabled page = ${this.currentPage}, limit = ${this.LIMIT}`);
       document.querySelector('#load_more').disabled = true;
     }
   }
 
+  /**
+   * Smoothly scrolls the page down by one viewport height over the specified duration.
+   * @param {number} duration - The duration of the scroll animation in milliseconds.
+   */
   smoothScrollTo(duration) {
     const initialY = window.scrollY;
     const targetY = initialY + document.documentElement.clientHeight;
@@ -2002,10 +2384,9 @@ class ScrollHandler {
       const time = timestamp - start;
       let percent = Math.min(time / duration, 1);
 
-      percent =
-        percent < 0.5
-          ? 2 * percent * percent
-          : -1 + (4 - 2 * percent) * percent;
+      percent = percent < 0.5
+        ? 2 * percent * percent
+        : -1 + (4 - 2 * percent) * percent;
 
       window.scrollTo(0, initialY + diff * percent);
 
@@ -2032,14 +2413,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ AboutUsPage)
 /* harmony export */ });
+/**
+ * Represents the About Us page of the website.
+ */
 class AboutUsPage {
+  /**
+   * Renders the About Us page content.
+   */
   render() {
     const root = document.querySelector('#root');
 
     root.innerHTML = `
     <my-header></my-header>
     <div class="container">
-      <section class="intro_video"">
+      <section class="intro_video">
         <h1>
           Who are we?
         </h1>
@@ -2084,8 +2471,32 @@ class AboutUsPage {
     `;
 
     AboutUsPage.observe();
+
+    const video = document.querySelector('video');
+
+    video.addEventListener('wheel', e => {
+      let volume = video.volume
+      if (e.deltaY > 0) {
+        volume -= 0.05;
+      } else  {
+        volume += 0.05;
+      }
+
+      if (volume < 0) {
+        volume = 0;
+      } else if (volume > 1) {
+        volume = 1;
+      }
+
+      video.volume = volume;
+
+    }, { passive: true });
   }
 
+  /**
+   * Observes sections of the About Us page and adds a 'show' class when they intersect the viewport.
+   * @static
+   */
   static observe() {
     const sections = document.querySelectorAll('.about_us');
 
@@ -2098,8 +2509,8 @@ class AboutUsPage {
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach((entry) => {
         entry.isIntersecting
-          ? entry.target.classList.add('show')
-          : entry.target.classList.remove('show');
+            ? entry.target.classList.add('show')
+            : entry.target.classList.remove('show');
       });
     }, options);
 
@@ -2124,18 +2535,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _PageRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../PageRenderer */ "./src/PageRenderer.js");
 
 
+/**
+ * Represents the Error Page of the website.
+ */
 class ErrorPage {
-
+  /**
+   * Renders the Error Page content.
+   * @function render
+   * @memberof ErrorPage
+   */
   render() {
     const root = document.querySelector('#root');
 
     root.innerHTML = `<my-header></my-header>
                      <div class="error"></div>
-    `
-
-    // PageRenderer.handleLinks();
+                     <my-connection-alert></my-connection-alert>
+    `;
   }
 }
+
 
 /***/ }),
 
@@ -2155,12 +2573,19 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Class representing the item page.
+ */
 class ItemPage {
+  /**
+   * Renders the item page.
+   * @param {string} search - The search string containing  path item/{id} about the requested item.
+   */
   async render(search) {
     const root = document.querySelector('#root');
 
     root.innerHTML = `
-    <section class="art loading">
+    <div class="art loading">
                     <div class="container">
                       <div class="art__img">
                       </div>
@@ -2177,8 +2602,8 @@ class ItemPage {
                         <button type="button" disabled class="art__info__buy">Buy copy</button>
                       </div>
                     </div>
-                  </section>
-    `
+                  </div>
+    `;
 
     const parts = search.split('/');
     const itemId = parts[parts.length - 1];
@@ -2188,7 +2613,7 @@ class ItemPage {
 
     root.innerHTML = `
                    <my-header></my-header>
-                       <section class="art">
+                       <div class="art">
                         <div class="container">
                           <div class="art__img">
                             <img src= ${item.imgSrc} alt="demonstration of art">
@@ -2207,24 +2632,33 @@ class ItemPage {
                             <button type="button" class="art__info__buy">Buy copy</button>
                           </div>
                         </div>
-                       </section>
+                       </div>
                    <my-navigation next="${next}" prev="${prev}"></my-navigation>
                    <my-modal active="false" item-id="${item.id}"></my-modal>
                    <my-connection-alert></my-connection-alert>
     `;
 
     document.querySelector('.art__info__buy').addEventListener('click', (e) => {
-      console.log(root.querySelector('my-modal'));
       root.querySelector('my-modal').setAttribute('active', 'true');
     });
 
     _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].handleLinks();
   }
 
+  /**
+   * Gets the previous item ID.
+   * @param {Object} item - The current item object.
+   * @returns {number|null} The previous item ID, or null if there is no previous item.
+   */
   static getPrev(item) {
     return item.id <= 1 ? null : item.id - 1;
   }
 
+  /**
+   * Gets the next item ID.
+   * @param {Object} item - The current item object.
+   * @returns {Promise<number|null>} The next item ID, or null if there is no next item.
+   */
   static async getNext(item) {
     return item.id >= (await _utils_DBfasade__WEBPACK_IMPORTED_MODULE_0__["default"].getArtsLimit()) ? null : item.id + 1;
   }
@@ -2251,30 +2685,46 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Class representing the main page.
+ */
 class MainPage {
   constructor() {
+    /**
+     * Stored items to be rendered on the page.
+     * @type {Array}
+     */
     this.storedItems = [];
-    this.scrollHandler = null;
+
+    /**
+     * Instance of ScrollHandler to handle scroll events.
+     * @type {ScrollHandler}
+     */
+    this.scrollHandler = new _handlers_ScrollHandler__WEBPACK_IMPORTED_MODULE_0__["default"](this);
   }
 
+  /**
+   * Renders the main page.
+   */
   render() {
     const root = document.querySelector('#root');
 
     root.innerHTML = `<my-header></my-header>
-                      <section class="catalog">
+                      <div class="catalog">
                         <div class="container" id="item_container">
                         </div>
-                      </section>
+                      </div>
                       <button class="pagination" id="load_more">Load more</button>
                    <my-connection-alert></my-connection-alert>
     `;
     const loadMore = document.querySelector('#load_more');
 
-    this.scrollHandler = new _handlers_ScrollHandler__WEBPACK_IMPORTED_MODULE_0__["default"](this);
-
-    loadMore.addEventListener('click', () => {
-      this.scrollHandler.handleScroll();
+    this.scrollHandler.disableLoadMoreIfNecessary().then(() => {
+      loadMore.addEventListener('click', () => {
+        this.scrollHandler.handleScroll();
+      });
     });
+
     if (this.storedItems.length) {
       this.renderStoredItems();
     } else {
@@ -2283,9 +2733,11 @@ class MainPage {
     _PageRenderer__WEBPACK_IMPORTED_MODULE_2__["default"].handleLinks();
   }
 
+  /**
+   * Renders stored items on the page.
+   */
   async renderStoredItems() {
     const root = document.querySelector('#root');
-
     const container = root.querySelector('#item_container');
 
     if (!this.storedItems.length) {
@@ -2297,6 +2749,9 @@ class MainPage {
     });
   }
 
+  /**
+   * Renders loading placeholders for items.
+   */
   renderLoadingItems() {
     const container = document.querySelector('#item_container');
 
@@ -2307,6 +2762,11 @@ class MainPage {
     }
   }
 
+  /**
+   * Renders new items on the page.
+   * @param {number} [page=0] - The page number to fetch items from.
+   * @param {number} [limit=8] - The number of items to fetch.
+   */
   async renderNewItems(page = 0, limit = 8) {
     this.renderLoadingItems();
     const items = await _utils_DBfasade__WEBPACK_IMPORTED_MODULE_1__["default"].getArts(page, limit);
@@ -2316,6 +2776,10 @@ class MainPage {
     this.renderStoredItems();
   }
 
+  /**
+   * Renders a single item on the page.
+   * @param {Object} item - The item to render.
+   */
   renderItem(item) {
     const container = document.querySelector('#item_container');
 
@@ -2341,29 +2805,54 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/**
+ * Class providing methods to interact with the backend server.
+ */
 class DBfasade {
+  /**
+   * Fetches a list of arts from the backend.
+   * @param {number} [page=0] - The page number to fetch.
+   * @param {number} [limitData=8] - The number of items to fetch per page.
+   * @returns {Promise<Object[]>} A promise that resolves to an array of art objects.
+   */
   static async getArts(page = 0, limitData = 8) {
     const arts = await fetch(
-      `http://127.0.0.1:8080/arts?page=${page}&size=${limitData}`,
+        `http://127.0.0.1:8080/arts?page=${page}&size=${limitData}`
     );
     return await arts.json();
   }
 
+  /**
+   * Fetches the total number of arts available.
+   * @returns {Promise<number>} A promise that resolves to the total number of arts.
+   */
   static async getArtsLimit() {
     const count = await fetch(`http://127.0.0.1:8080/arts/count`);
     return count.json();
   }
 
+  /**
+   * Fetches a specific art by its ID. If the fetch fails, it defaults to fetching the art with ID 1.
+   * @param {number} [id=1] - The ID of the art to fetch.
+   * @returns {Promise<Object>} A promise that resolves to an art object.
+   */
   static async getArt(id = 1) {
     try {
       const art = await fetch(`http://127.0.0.1:8080/arts/${id}`);
-      return await art.json();;
+      return await art.json();
     } catch (e) {
       const art = await fetch(`http://127.0.0.1:8080/arts/1`);
       return await art.json();
     }
   }
 
+  /**
+   * Sends lead data to the backend.
+   * @param {Object} data - The lead data to send.
+   * @param {string} data.name - The name of the lead.
+   * @param {string} data.email - The email of the lead.
+   * @returns {Promise<Object>} A promise that resolves to the response from the server.
+   */
   static async sendLead(data) {
     const response = await fetch('http://127.0.0.1:8080/leads', {
       method: 'POST',
@@ -2499,19 +2988,12 @@ window.customElements.define('my-navigation', _components_MyNavigation_MyNavigat
 window.customElements.define('my-item-card', _components_MyItemCard_MyItemCard__WEBPACK_IMPORTED_MODULE_8__["default"]);
 window.customElements.define('my-connection-alert', _components_MyConnectionAlert_MyConnectionAlert__WEBPACK_IMPORTED_MODULE_9__["default"]);
 
-window.addEventListener('load', (e) => {
-  console.log("я должен работать один раз");
-  handleEvent(e);
-});
+window.addEventListener('load', handleEvent);
 
-window.addEventListener('popstate', (e) => {
-  const search = window.location.pathname;
-  console.log("я должен работать не один раз");
-  _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].renderPage(search);
-})
+window.addEventListener('popstate', handleEvent)
 
 function handleEvent(e) {
-  e.preventDefault();
+  // e.preventDefault();
   const search = window.location.pathname;
   history.pushState({}, '', window.location.href);
   _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].renderPage(search);
