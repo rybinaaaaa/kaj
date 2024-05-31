@@ -2365,7 +2365,6 @@ class ScrollHandler {
   async disableLoadMoreIfNecessary() {
     await this.fetchLimit();
     if (this.LIMIT && (this.currentPage + 1) * this.LIMIT_PER_PAGE >= this.LIMIT) {
-    console.log(`disabled page = ${this.currentPage}, limit = ${this.LIMIT}`);
       document.querySelector('#load_more').disabled = true;
     }
   }
@@ -2979,6 +2978,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Define custom elements.
+ */
 window.customElements.define('my-audio', _components_MyAudio_MyAudio__WEBPACK_IMPORTED_MODULE_2__["default"]);
 window.customElements.define('my-modal-alert', _components_MyModal_MyModalAlert_MyModalAlert__WEBPACK_IMPORTED_MODULE_4__["default"]);
 window.customElements.define('my-modal-buy', _components_MyModal_MyModalToBuy_MyModalToBuy__WEBPACK_IMPORTED_MODULE_5__["default"]);
@@ -2988,10 +2990,22 @@ window.customElements.define('my-navigation', _components_MyNavigation_MyNavigat
 window.customElements.define('my-item-card', _components_MyItemCard_MyItemCard__WEBPACK_IMPORTED_MODULE_8__["default"]);
 window.customElements.define('my-connection-alert', _components_MyConnectionAlert_MyConnectionAlert__WEBPACK_IMPORTED_MODULE_9__["default"]);
 
+/**
+ * Event listener for the 'load' event.
+ * @param {Event} e - The load event.
+ */
 window.addEventListener('load', handleEvent);
 
-window.addEventListener('popstate', handleEvent)
+/**
+ * Event listener for the 'popstate' event.
+ * @param {PopStateEvent} e - The popstate event.
+ */
+window.addEventListener('popstate', handleEvent);
 
+/**
+ * Handle various events and render the appropriate page.
+ * @param {Event} e - The event to handle.
+ */
 function handleEvent(e) {
   // e.preventDefault();
   const search = window.location.pathname;
@@ -2999,6 +3013,15 @@ function handleEvent(e) {
   _PageRenderer__WEBPACK_IMPORTED_MODULE_1__["default"].renderPage(search);
 }
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/semka24/src/utils/sw.js').then(function(registration) {
+      console.log('Service Worker registrated:', registration);
+    }).catch(function(error) {
+      console.log('Error Service Worker:', error);
+    });
+  });
+}
 })();
 
 /******/ })()
